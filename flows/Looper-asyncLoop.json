@@ -1,0 +1,253 @@
+{
+	"schemaVersion": "4",
+	"info": {
+		"name": "Looper - get /async"
+	},
+	"parameter": {
+		"properties": {
+			"params": {
+				"type": "object",
+				"description": "The parameters from the endpoint."
+			},
+			"request": {
+				"type": "object",
+				"description": "The HTTP request."
+			},
+			"config": {
+				"type": "object",
+				"description": "The service's configuration"
+			},
+			"env": {
+				"type": "object",
+				"description": "The host OS environment"
+			}
+		},
+		"additionalProperties": false,
+		"required": [
+			"request",
+			"config",
+			"env",
+			"params"
+		]
+	},
+	"start": "condition.1",
+	"nodes": {
+		"event.1": {
+			"type": "nodehandler://@axway/api-builder-plugin-ft-event/event",
+			"name": "Emit event",
+			"method": "emit",
+			"parameters": [
+				{
+					"name": "event",
+					"type": "string",
+					"value": "\"loop\"",
+					"metaName": "Event name",
+					"metaDescription": "The name of the event to emit to be handled by the event flow-trigger."
+				},
+				{
+					"name": "data",
+					"type": "jsonpath",
+					"value": "$.data",
+					"metaName": "Data",
+					"metaDescription": "The data to emit."
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": null,
+					"routes": [
+						"javascript.2"
+					],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.error",
+					"routes": [
+						"http.2"
+					],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Emit event"
+		},
+		"http.1": {
+			"type": "nodehandler://axway-flow/http",
+			"name": "Success",
+			"method": "setresponse",
+			"parameters": [
+				{
+					"name": "status",
+					"type": "number",
+					"value": "200",
+					"metaName": "Status",
+					"metaDescription": "The HTTP status code"
+				},
+				{
+					"name": "body",
+					"type": "jsonpath",
+					"value": "$.response.body",
+					"metaName": "Body",
+					"metaDescription": "The response payload"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.response",
+					"routes": [],
+					"metaName": "Next"
+				}
+			},
+			"metaMethod": "Set HTTP Response"
+		},
+		"condition.1": {
+			"type": "nodehandler://axway-flow/condition",
+			"name": "Greater Than",
+			"method": "greater-than",
+			"parameters": [
+				{
+					"name": "source",
+					"type": "jsonpath",
+					"value": "$.params.counter",
+					"metaName": "Source",
+					"metaDescription": "The input to test."
+				},
+				{
+					"name": "value",
+					"type": "number",
+					"value": "0",
+					"metaName": "Value",
+					"metaDescription": "The value to test input against."
+				}
+			],
+			"outputs": {
+				"true": {
+					"routes": [
+						"javascript.1"
+					],
+					"context": "$.greaterThan",
+					"metaName": "True"
+				},
+				"false": {
+					"routes": [
+						"http.2"
+					],
+					"context": "$.greaterThan",
+					"metaName": "False"
+				}
+			},
+			"metaMethod": "Greater Than"
+		},
+		"http.2": {
+			"type": "nodehandler://axway-flow/http",
+			"name": "Error",
+			"method": "setresponse",
+			"parameters": [
+				{
+					"name": "status",
+					"type": "number",
+					"value": "400",
+					"metaName": "Status",
+					"metaDescription": "The HTTP status code"
+				},
+				{
+					"name": "headers",
+					"type": "jsonpath",
+					"value": "$",
+					"metaName": "Headers",
+					"metaDescription": "Key-value pairs of headers"
+				},
+				{
+					"name": "body",
+					"type": "jsonpath",
+					"value": "$.error",
+					"metaName": "Body",
+					"metaDescription": "The response payload"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.response",
+					"routes": [],
+					"metaName": "Next"
+				}
+			},
+			"metaMethod": "Set HTTP Response"
+		},
+		"javascript.1": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-javascript/javascript",
+			"name": "EventData",
+			"method": "Execute",
+			"parameters": [
+				{
+					"name": "data",
+					"type": "jsonpath",
+					"value": "$",
+					"metaName": "Data",
+					"metaDescription": "The value to apply as the `data` argument to the JavaScript code. For objects and arrays, `data` is passed by reference."
+				},
+				{
+					"name": "code",
+					"type": "string",
+					"value": "\"return {\\n    counter: data.params.counter,\\n    url: data.config.looper.url,\\n    headers: { ...data.request.headers }\\n  };\"",
+					"metaName": "Code",
+					"metaDescription": "A JavaScript function body. Supports `await` and returning promises."
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.data",
+					"routes": [
+						"event.1"
+					],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.error",
+					"routes": [
+						"http.2"
+					],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Execute"
+		},
+		"javascript.2": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-javascript/javascript",
+			"name": "FormatResponse",
+			"method": "Execute",
+			"parameters": [
+				{
+					"name": "code",
+					"type": "string",
+					"value": "\"return {\\n    body: `${data.counter}`\\n  };\"",
+					"metaName": "Code",
+					"metaDescription": "A JavaScript function body. Supports `await` and returning promises."
+				},
+				{
+					"name": "data",
+					"type": "jsonpath",
+					"value": "$.params",
+					"metaName": "Data",
+					"metaDescription": "The value to apply as the `data` argument to the JavaScript code. For objects and arrays, `data` is passed by reference."
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.response",
+					"routes": [
+						"http.1"
+					],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.error",
+					"routes": [
+						"http.2"
+					],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Execute"
+		}
+	}
+}

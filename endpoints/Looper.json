@@ -1,0 +1,66 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Looping API",
+    "version": "1.0.0",
+    "title": "Looper API"
+  },
+  "paths": {
+    "/async": {
+      "get": {
+        "description": "Triggers a assynchronous loop",
+        "operationId": "asyncLoop",
+        "parameters": [
+          {
+            "description": "The counter",
+            "in": "query",
+            "name": "counter",
+            "required": true,
+            "type": "number"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Failure"
+          }
+        },
+        "summary": "Loop call",
+        "x-flow": "Looper-asyncLoop"
+      }
+    },
+    "/sync": {
+      "get": {
+        "description": "Triggers a synchronous loop",
+        "operationId": "syncLoop",
+        "parameters": [
+          {
+            "description": "The counter",
+            "in": "query",
+            "name": "counter",
+            "required": true,
+            "type": "number"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Failure"
+          }
+        },
+        "summary": "Loop call",
+        "x-flow": "Looper-syncLoop"
+      }
+    }
+  }
+}

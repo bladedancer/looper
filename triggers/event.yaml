@@ -1,0 +1,13 @@
+triggers:
+  loop-event:
+    enabled: true
+    name: Loop
+    parameters:
+      # the event name (case-sensitive)
+      event: loop
+    invoke:
+      flow: AsyncLoopFlow
+      parameters:
+        request: $.request
+        config: $.config
+        env: $.env
