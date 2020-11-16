@@ -129,7 +129,7 @@
 				},
 				"false": {
 					"routes": [
-						"http.2"
+						"http.1"
 					],
 					"context": "$.greaterThan",
 					"metaName": "False"
@@ -188,7 +188,7 @@
 				{
 					"name": "code",
 					"type": "string",
-					"value": "\"return {\\n    counter: data.params.counter,\\n    url: data.config.looper.url,\\n    headers: { ...data.request.headers }\\n  };\"",
+					"value": "\"const txnId = data.request.headers['request-id'] || data.request.headers['x-request-id'] || data.request.headers['x-axway-transaction-id'] || 'myTxn';\\n  return {\\n    counter: data.params.counter,\\n    url: data.config.looper.url,\\n    headers: {\\n    \\t'x-axway-transaction-id': txnId,\\n      \\t'request-id': txnId\\n    }\\n  };\"",
 					"metaName": "Code",
 					"metaDescription": "A JavaScript function body. Supports `await` and returning promises."
 				}

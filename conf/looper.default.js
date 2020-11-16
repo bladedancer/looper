@@ -4,6 +4,6 @@
  */
 module.exports = {
 	looper: {
-		url: 'http://localhost:8080/api'
+		url: process.env.URL || 'http://localhost:8080/api'
 	}
 };

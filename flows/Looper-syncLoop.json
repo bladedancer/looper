@@ -223,7 +223,7 @@
 				{
 					"name": "code",
 					"type": "string",
-					"value": "\"const url = data.config.looper.url;\\n  const txnId = data['x-axway-transaction-id'] || 'myTxn';\\n  // QUICK and dirty\\n  return {\\n    url: `${url}/sync?counter=${data.params.counter-1}`,\\n    headers: {\\n    \\t'x-axway-transaction-id': txnId\\n    }\\n  };\"",
+					"value": "\"const url = data.config.looper.url;\\n  const txnId = data.request.headers['request-id'] || data.request.headers['x-request-id'] || data.request.headers['x-axway-transaction-id'] || 'myTxn';\\n  // QUICK and dirty\\n  return {\\n    url: `${url}/sync?counter=${data.params.counter-1}`,\\n    headers: {\\n    \\t'x-axway-transaction-id': txnId,\\n      \\t'request-id': txnId\\n    }\\n  };\"",
 					"metaName": "Code",
 					"metaDescription": "A JavaScript function body. Supports `await` and returning promises."
 				}
